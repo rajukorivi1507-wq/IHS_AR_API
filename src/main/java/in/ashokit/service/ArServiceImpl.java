@@ -20,63 +20,28 @@ import in.ashokit.repositories.UserRepo;
 public class ArServiceImpl implements ArService {
 
 	@Autowired
-	private AppRepo appRepo;
+	private CitizenAppRepository appRepo;
 
 	@Autowired
 	private UserRepo userRepo;
 
-	private static final String SSA_WEB_API_URL = "https://ssa.web.app/{ssn}";
-
 	@Override
-	public String createApplication(App app) {
-		try {
-			WebClient webClient = WebClient.create();
+	public Integer createApplication(CitizenApp app) {
+		 String endpoint = "https://ssa.web.app/{ssn}";
 
-			String stateName = webClient.get().uri(SSA_WEB_API_URL, app.getSsn()).retrieve().bodyToMono(String.class)
-					.block();
+		RestTemplate rt = new RestTemplate();
+		ResponseEntity<String> resEntity=rt.getForEntity(endpointurl,String.class,app.getSsn());
+		String stateName = resEntity.getBody();
+        if("New Jersey".equals(statename)){
+			CitizenAppEntity entity=new CitizenAppEntity;
+			BeanUtils.copyProperties(app,entity);
 
-			if (AppConstants.RI.equals(stateName)) {
+			entity.getStatename(statename);
+			CitizenAppEntity save = appRepo.save(entity);
 
-				UserEntity userEntity = userRepo.findById(app.getUserId()).get();
-
-				AppEntity appEntity = new AppEntity();
-				BeanUtils.copyProperties(app, appEntity);
-
-				appEntity.setUser(userEntity);
-
-				appEntity = appRepo.save(appEntity);
-				return "App Created with Case Num : " + appEntity.getCaseNum();
-			}
-		} catch (Exception e) {
-			throw new SsaWebException(e.getMessage());
+			return save.getAppId();
 		}
-
-		return AppConstants.INVALID_SSN;
+		return 0;	
 	}
 
-	@Override
-	public List<App> fetchApps(Integer userId) {
-
-		UserEntity userEntity = userRepo.findById(userId).get();
-		Integer roleId = userEntity.getRoleId();
-
-		List<AppEntity> appEntities = null;
-
-		if (1 == roleId) {
-			appEntities = appRepo.fetchUserApps();
-		} else {
-			appEntities = appRepo.fetchCwApps(userId);
-		}
-		
-		List<App> apps = new ArrayList<>();
-		
-		for(AppEntity entity : appEntities) {
-			App app = new App();
-			BeanUtils.copyProperties(entity, apps);
-			apps.add(app);
-		}
-
-		return apps;
-	}
-
-}
+	
