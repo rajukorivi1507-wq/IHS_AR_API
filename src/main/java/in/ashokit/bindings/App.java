@@ -2,7 +2,7 @@ package in.ashokit.bindings;
 
 import java.time.LocalDate;
 
-public class App {
+public class CitizenApp {
 
 	private Long caseNum;
 
