@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import in.ashokit.entities.AppEntity;
 
-public interface AppRepo extends JpaRepository<AppEntity, Long> {
+public interface CitizenAppRepository extends JpaRepository<AppEntity, Long> {
 
 	public List<AppEntity> fetchUserApps();
 
