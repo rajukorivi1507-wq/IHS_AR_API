@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "IES_APPS")
-public class AppEntity {
+public class CitizenAppEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
