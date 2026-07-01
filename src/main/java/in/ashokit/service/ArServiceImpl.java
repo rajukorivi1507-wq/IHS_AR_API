@@ -29,9 +29,20 @@ public class ArServiceImpl implements ArService {
 	public Integer createApplication(CitizenApp app) {
 		 String endpoint = "https://ssa.web.app/{ssn}";
 
-		RestTemplate rt = new RestTemplate();
+		// for both synchronous and asynchronous  call
+		/* RestTemplate rt = new RestTemplate();
 		ResponseEntity<String> resEntity=rt.getForEntity(endpointurl,String.class,app.getSsn());
-		String stateName = resEntity.getBody();
+		String stateName = resEntity.getBody(); */
+
+		//use webflux dependency - only for synchronous call
+		Webclient webclient = Webclient.create();
+        String statename = webclient.get() // it represents GET request
+		                   .uri(endpointurl,app.getSsn()) // It represents url to send req
+		                    .retrieve() // to retrieve response
+		                    .bodyToMono(String.class) // to specify response type
+		                    .block(); // to make synchronous call
+
+		
         if("New Jersey".equals(statename)){
 			CitizenAppEntity entity=new CitizenAppEntity;
 			BeanUtils.copyProperties(app,entity);
