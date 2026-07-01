@@ -21,11 +21,15 @@ public class ArRestController {
 	private ArService arService;
 	
 	@PostMapping("/app")
-	public ResponseEntity<String> createApp(@RequestBody App app){
+	public ResponseEntity<String> createCitizenApp(@RequestBody CitizenApp app){
 		
-		String status = arService.createApplication(app);
-		
-		return new ResponseEntity<>(status, HttpStatus.OK);
+		String appId = arService.createApplication(app);
+
+		if(appId>0){
+			return new ResponseEntity<>("App Created with App Id :"+appId, HttpStatus.OK);
+		}else{
+			return new ResponseEntity<>("Invalid SSN",HttpStatus.BADREQUEST);
+		}
 	}
 	
 	@GetMapping("/apps/{userId}")
